@@ -29,7 +29,16 @@ IceGitCloneUsingCommandLineTool >> execute [
 				onExit:  [ :process :outString :errString |
 					succedded := process isSuccess.
 					stdOut := outString.
-					stdErr := errString ]  ].
+					stdErr := errString ]  ]
+		ifFalse: [ 
+			self 
+				executeUsingWindowsSubProcessRepoDirectory: repoDirectory 
+				parent: parent 
+				onExit:  [ :process :outString :errString |
+					succedded := process isSuccess.
+					stdOut := outString.
+					stdErr := errString ] 
+			 ].
 	
 	succedded 
 		ifFalse: [ 
@@ -51,6 +60,38 @@ IceGitCloneUsingCommandLineTool >> executeUsingUnixSubProcessRepoDirectory: repo
 		redirectStdout;
 		redirectStderr;
 		runAndWaitOnExitDo: onExitBlock
+]
+
+{ #category : 'executing' }
+IceGitCloneUsingCommandLineTool >> executeUsingWindowsSubProcessRepoDirectory: repoDirectory parent: parent onExit: onExitBlock [
+
+	| stderrFile stdoutFile command return |
+	stderrFile := FileLocator temp / 'git-stderr.txt'.
+	stdoutFile := FileLocator temp / 'git-stdout.txt'.
+
+	command := String streamContents: [ :stream |
+		           stream
+			           nextPutAll: 'git clone ';
+			           nextPutAll: url;
+			           nextPutAll: ' ';
+			           nextPutAll: repoDirectory;
+			           nextPutAll: ' 2> ';
+			           nextPutAll: stderrFile fullName;
+			           nextPutAll: ' 1> ';
+			           nextPutAll: stdoutFile fullName ].
+
+	return := OSWSWinProcess new
+		          shellCommand: command;
+		          workingDirectory: parent fullName;
+		          runAndWait.
+
+	onExitBlock
+		value: return
+		value: stdoutFile contents
+		value: stderrFile contents.
+
+	stderrFile ensureDelete.
+	stdoutFile ensureDelete
 ]
 
 { #category : 'accessing' }
