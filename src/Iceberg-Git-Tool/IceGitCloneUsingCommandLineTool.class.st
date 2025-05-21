@@ -91,19 +91,26 @@ IceGitCloneUsingCommandLineTool >> executeUsingWindowsSubProcessRepoDirectory: r
 
 	command := String streamContents: [ :stream |
 		           stream
-			           nextPutAll: 'git clone ';
+			           nextPutAll: 'git clone --progress ';
 			           nextPutAll: url;
 			           nextPutAll: ' ';
 			           nextPutAll: repoDirectory;
-			           nextPutAll: ' 2> ';
+			           nextPutAll: ' 2>> ';
 			           nextPutAll: stderrFile fullName;
-			           nextPutAll: ' 1> ';
+			           nextPutAll: ' 1>> ';
 			           nextPutAll: stdoutFile fullName ].
 
 	return := OSWSWinProcess new
 		          shellCommand: command;
+					 creationFlags: 16r08000000 "CREATE_NO_WINDOW";
 		          workingDirectory: parent fullName;
-		          runAndWait.
+		          run.
+
+	[return isRunning ] 
+		whileTrue: [ 
+			[self updateJobStatus: stderrFile contents] on: FileDoesNotExistException do: [  ].
+			MorphicRenderLoop new doOneCycle.
+			1 second wait ].
 
 	onExitBlock
 		value: return
