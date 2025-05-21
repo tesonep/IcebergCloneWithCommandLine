@@ -11,8 +11,9 @@ BaselineOfIcebergCloneWithCommandLine >> baseline: spec [
 
 	spec for: #'common' do: [
 		
-		self osSubprocess: spec.
-		self osWinSubprocess: spec.
+		Smalltalk os isWindows
+			ifTrue: [ self osWinSubprocess: spec ]
+			ifFalse: [ self osSubprocess: spec ].
 		
 		spec 
 			package: 'Iceberg-Git-Tool' ].

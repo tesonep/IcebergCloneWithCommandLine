@@ -50,12 +50,16 @@ IceGitCloneUsingCommandLineTool >> execute [
 { #category : 'executing' }
 IceGitCloneUsingCommandLineTool >> executeUsingUnixSubProcessRepoDirectory: repoDirectory parent: parent onExit: onExitBlock [
 
-	| outFullStream errFullStream |
+	| outFullStream errFullStream osUnixSubprocessClass |
+
+	osUnixSubprocessClass := self class environment 
+		at: #OSSUnixSubprocess 
+		ifAbsent: [ self error: 'Missing OSSUnixSubprocess class' ]. 
 
 	outFullStream := WriteStream on: (String new: 10000).
 	errFullStream := WriteStream on: (String new: 10000).
 
-	OSSUnixSubprocess new
+	osUnixSubprocessClass new
 		command: '/usr/bin/git';
 		arguments: {
 				'clone'.
@@ -85,7 +89,12 @@ IceGitCloneUsingCommandLineTool >> executeUsingUnixSubProcessRepoDirectory: repo
 { #category : 'executing' }
 IceGitCloneUsingCommandLineTool >> executeUsingWindowsSubProcessRepoDirectory: repoDirectory parent: parent onExit: onExitBlock [
 
-	| stderrFile stdoutFile command return |
+	| stderrFile stdoutFile command return osWSWinProcessClass |
+
+	osWSWinProcessClass := self class environment 
+		at: #OSWSWinProcess 
+		ifAbsent: [ self error: 'Missing OSWSWinProcess class' ]. 
+
 	stderrFile := FileLocator temp / 'git-stderr.txt'.
 	stdoutFile := FileLocator temp / 'git-stdout.txt'.
 
@@ -100,7 +109,7 @@ IceGitCloneUsingCommandLineTool >> executeUsingWindowsSubProcessRepoDirectory: r
 			           nextPutAll: ' 1>> ';
 			           nextPutAll: stdoutFile fullName ].
 
-	return := OSWSWinProcess new
+	return := osWSWinProcessClass new
 		          shellCommand: command;
 					 creationFlags: 16r08000000 "CREATE_NO_WINDOW";
 		          workingDirectory: parent fullName;
