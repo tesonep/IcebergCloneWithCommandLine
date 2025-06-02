@@ -147,6 +147,7 @@ IceGitCloneUsingCommandLineTool >> updateJobStatus: outputString [
 	lines ifEmpty: [ ^ self ].
 	
 	lastLine := lines last.
+	progress := 0.
 	
 	(lastLine includesSubstring: 'Counting objects')
 		ifTrue: [progress := 0].	
