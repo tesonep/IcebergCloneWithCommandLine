@@ -115,11 +115,12 @@ IceGitCloneUsingCommandLineTool >> executeUsingWindowsSubProcessRepoDirectory: r
 		          workingDirectory: parent fullName;
 		          run.
 
-	[return isRunning ] 
+	"We need to wait until the watcher, updates the exitCode"
+	[return isRunning or: [return exitCode isNil]] 
 		whileTrue: [ 
 			[self updateJobStatus: stderrFile contents] on: FileDoesNotExistException do: [  ].
 			MorphicRenderLoop new doOneCycle.
-			1 second wait ].
+			100 milliSecond wait ].
 
 	onExitBlock
 		value: return
