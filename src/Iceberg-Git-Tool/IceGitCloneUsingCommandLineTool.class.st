@@ -89,7 +89,7 @@ IceGitCloneUsingCommandLineTool >> executeUsingUnixSubProcessRepoDirectory: repo
 { #category : 'executing' }
 IceGitCloneUsingCommandLineTool >> executeUsingWindowsSubProcessRepoDirectory: repoDirectory parent: parent onExit: onExitBlock [
 
-	| stderrFile stdoutFile command return osWSWinProcessClass |
+	| stderrFile stdoutFile command return osWSWinProcessClass rnd |
 
 	osWSWinProcessClass := self class environment 
 		at: #OSWSWinProcess 
