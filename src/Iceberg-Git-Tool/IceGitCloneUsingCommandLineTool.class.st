@@ -95,8 +95,10 @@ IceGitCloneUsingCommandLineTool >> executeUsingWindowsSubProcessRepoDirectory: r
 		at: #OSWSWinProcess 
 		ifAbsent: [ self error: 'Missing OSWSWinProcess class' ]. 
 
-	stderrFile := FileLocator temp / 'git-stderr.txt'.
-	stdoutFile := FileLocator temp / 'git-stdout.txt'.
+	rnd := (Random new nextInteger:16r10000) printStringHex.
+
+	stderrFile := FileLocator temp / ('git-stderr-' , rnd , '.txt').
+	stdoutFile := FileLocator temp / ('git-stdout-' , rnd , '.txt').
 
 	command := String streamContents: [ :stream |
 		           stream
